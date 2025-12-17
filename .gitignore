@@ -1,0 +1,22 @@
+# Python
+*.py
+__pycache__/
+*.pyc
+venv/
+env/
+
+# macOS
+.DS_Store
+
+# Build artifacts
+*.zip
+
+# PNG screenshots (keep in promotional_materials only)
+/*.png
+
+# Development files
+process_icons_v2.py
+
+# IDE
+.vscode/
+.idea/

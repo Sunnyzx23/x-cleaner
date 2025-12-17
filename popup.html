@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X Cleaner Settings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>X Cleaner</h1>
+            <div class="status-badge" id="statusBadge">精简模式</div>
+        </header>
+
+        <div class="section mode-section">
+            <h2>模式</h2>
+            <div class="radio-group horizontal">
+                <label class="radio-label">
+                    <input type="radio" name="mode" value="original">
+                    <span>原始模式</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="mode" value="clean" checked>
+                    <span>精简模式</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="section filter-section" id="filterSection">
+            <h2>过滤规则 <span class="hint-inline">(满足任一条件即显示)</span></h2>
+
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="hideShortText" checked>
+                    <span>隐藏短文本推文 <span class="sub-text">(中 < 45 / 英 < 30)</span></span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showOnlyImage">
+                    <span>只显示带图推文</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showOnlyVideo">
+                    <span>只显示带视频推文</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showImageVideo">
+                    <span>只显示图+视频推文</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="section language-section">
+            <h2>语言过滤</h2>
+            <select id="languageFilter">
+                <option value="all">全部</option>
+                <option value="zh">仅中文</option>
+                <option value="non-zh">仅英文</option>
+            </select>
+
+            <div class="section engagement-section">
+                <h2>互动量过滤</h2>
+                <p class="hint">设置互动量区间 (0表示不限制)</p>
+                <div class="engagement-inputs">
+                    <div class="input-row">
+                        <label>浏览量</label>
+                        <div class="range-inputs">
+                            <input type="number" id="minViews" placeholder="最低" min="0">
+                            <span>-</span>
+                            <input type="number" id="maxViews" placeholder="最高" min="0">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>点赞数</label>
+                        <div class="range-inputs">
+                            <input type="number" id="minLikes" placeholder="最低" min="0">
+                            <span>-</span>
+                            <input type="number" id="maxLikes" placeholder="最高" min="0">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>转发数</label>
+                        <div class="range-inputs">
+                            <input type="number" id="minRetweets" placeholder="最低" min="0">
+                            <span>-</span>
+                            <input type="number" id="maxRetweets" placeholder="最高" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <button id="saveBtn" class="primary-btn">保存设置</button>
+                    <div id="saveStatus" class="save-status"></div>
+                </div>
+            </div>
+            <script src="popup.js"></script>
+</body>
+
+</html>
