@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PureFeed - Screenshot (1280x800)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .screenshot-container {
+            width: 1280px;
+            height: 800px;
+            background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+            border-radius: 20px;
+            padding: 60px;
+            display: flex;
+            gap: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .left-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+
+        .logo-section {
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            object-fit: cover;
+            filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.25));
+        }
+
+        .text-content {
+            flex: 1;
+        }
+
+        .logo {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .tagline {
+            font-size: 24px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .right-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-mockup {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .popup-header {
+            background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+            padding: 25px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .popup-content {
+            padding: 25px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option.active {
+            border-color: #1d9bf0;
+            background: rgba(29, 155, 240, 0.1);
+            color: #1d9bf0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .checkbox.checked {
+            background: #1d9bf0;
+            border-color: #1d9bf0;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .select-box {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .save-button {
+            width: 100%;
+            padding: 14px;
+            background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="screenshot-container">
+        <div class="left-section">
+            <div class="logo-section">
+                <img src="icon128.png" alt="PureFeed Logo" class="logo-image">
+                <div class="text-content">
+                    <div class="logo">PureFeed</div>
+                    <div class="tagline">让时间线更纯净</div>
+                </div>
+            </div>
+
+            <ul class="features-list">
+                <li class="feature-item">
+                    <div class="feature-icon">🎯</div>
+                    <span>智能过滤低价值内容</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">📝</div>
+                    <span>隐藏短文本内容</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">🖼️</div>
+                    <span>媒体类型筛选</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">🌐</div>
+                    <span>多语言过滤</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <span>互动量阈值设置</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <span>实时生效，无需刷新</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="right-section">
+            <div class="popup-mockup">
+                <div class="popup-header">
+                    <div class="popup-title">PureFeed</div>
+                    <div class="status-badge">精简模式</div>
+                </div>
+
+                <div class="popup-content">
+                    <div class="section">
+                        <div class="section-title">模式</div>
+                        <div class="radio-group">
+                            <div class="radio-option">原始模式</div>
+                            <div class="radio-option active">精简模式</div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">过滤规则</div>
+                        <div class="checkbox-item">
+                            <div class="checkbox checked"></div>
+                            <span>隐藏短文本推文</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox checked"></div>
+                            <span>只显示带图推文</span>
+                        </div>
+                        <div class="checkbox-item">
+                            <div class="checkbox"></div>
+                            <span>只显示带视频推文</span>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">语言过滤</div>
+                        <select class="select-box">
+                            <option>全部</option>
+                        </select>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">互动量过滤</div>
+                        <div class="hint">设置最低浏览量、点赞等</div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" class="select-box" placeholder="浏览量 ≥" style="flex: 1;">
+                            <input type="text" class="select-box" placeholder="点赞 ≥" style="flex: 1;">
+                        </div>
+                    </div>
+
+                    <button class="save-button">保存设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

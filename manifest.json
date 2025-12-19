@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "X Cleaner",
-  "version": "1.0.1",
-  "description": "Filter low-value content on X (Twitter) to make browsing more efficient.",
+  "name": "PureFeed - 极简推文过滤",
+  "version": "1.1.0",
+  "description": "一键开启纯净模式，过滤X/Twitter低价值短内容。支持媒体类型、语言和互动量筛选，让时间线回归本质。",
   "permissions": [
     "storage"
   ],

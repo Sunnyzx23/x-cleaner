@@ -28,22 +28,22 @@ function updateBadge() {
     }, (settings) => {
         // Safety check
         if (!settings) {
-            console.log('X Cleaner: No settings found');
+            console.log('PureFeed: No settings found');
             return;
         }
 
         const mode = settings.mode || 'clean';
-        console.log('X Cleaner: Updating badge, mode =', mode);
+        console.log('PureFeed: Updating badge, mode =', mode);
 
         // If in clean mode, show "ON" badge
         if (mode === 'clean' || mode === 'refined') {
             chrome.action.setBadgeText({ text: 'ON' });
-            chrome.action.setBadgeBackgroundColor({ color: '#1d9bf0' }); // Twitter blue
-            console.log('X Cleaner: Badge set to ON');
+            chrome.action.setBadgeBackgroundColor({ color: '#4F46E5' }); // Deep Indigo
+            console.log('PureFeed: Badge set to ON');
         } else {
             // Original mode: no badge
             chrome.action.setBadgeText({ text: '' });
-            console.log('X Cleaner: Badge cleared');
+            console.log('PureFeed: Badge cleared');
         }
     });
 }

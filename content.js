@@ -1,7 +1,7 @@
-// X Cleaner - Content Script
+// PureFeed - Content Script
 // Architecture v2 - Stable and reliable
 
-console.log('X Cleaner: Content script loaded v2');
+console.log('PureFeed: Content script loaded v2');
 
 // Settings
 let settings = {
@@ -45,7 +45,7 @@ function loadSettings() {
         'minRetweets', 'maxRetweets'
     ], (items) => {
         settings = { ...settings, ...items };
-        console.log('X Cleaner: Settings loaded', settings);
+        console.log('PureFeed: Settings loaded', settings);
 
         // Update visibility of already-processed tweets (don't reprocess)
         updateAllTweetVisibility();
@@ -336,12 +336,13 @@ function showNotification() {
         left: 50%;
         transform: translateX(-50%);
         z-index: 10000;
-        background: linear-gradient(135deg, #1d9bf0 0%, #1a8cd8 100%);
+        background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);
         color: white;
         padding: 16px 20px;
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         max-width: 500px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
     `;
 
     const container = document.createElement('div');

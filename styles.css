@@ -2,7 +2,8 @@
   --bg-color: #ffffff;
   --text-color: #0f1419;
   --border-color: #cfd9de;
-  --primary-color: #1d9bf0;
+  --primary-color: #4F46E5;
+  --accent-color: #F59E0B;
   --secondary-bg: #f7f9f9;
   --danger-color: #f4212e;
   --success-color: #00ba7c;
@@ -164,7 +165,7 @@ textarea {
 }
 
 .primary-btn:hover {
-  background-color: #1a8cd8;
+  background-color: #3730A3;
 }
 
 .save-status {
@@ -299,7 +300,7 @@ textarea {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(29, 155, 240, 0.95);
+  background: rgba(79, 70, 229, 0.95);
   color: white;
   padding: 12px 20px;
   border-radius: 20px;
@@ -314,7 +315,7 @@ textarea {
 }
 
 .filter-section.disabled::after:hover {
-  background: rgba(26, 140, 216, 0.95);
+  background: rgba(55, 48, 163, 0.95);
   transform: translate(-50%, -50%) scale(1.02);
 }
 
