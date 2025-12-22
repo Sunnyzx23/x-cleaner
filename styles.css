@@ -50,21 +50,65 @@ h3 {
   font-weight: 600;
 }
 
-.status-badge {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.status-badge.original {
-  background-color: #536471;
+.toggle-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.toggle-switch input:checked+.toggle-slider {
+  background-color: var(--primary-color);
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+  transform: translateX(20px);
 }
 
 .section {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .radio-group {
@@ -117,7 +161,7 @@ select {
   border-radius: 4px;
   border: 1px solid var(--border-color);
   margin-top: 4px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 textarea {
@@ -146,33 +190,58 @@ textarea {
 
 .footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 16px;
-  border-top: 1px solid var(--border-color);
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
   padding-top: 16px;
+  padding-bottom: 4px;
+  border-top: 2px solid var(--border-color);
+  background: var(--bg-color);
+  position: sticky;
+  bottom: 0;
 }
 
 .primary-btn {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #3730A3 100%);
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
 }
 
-.primary-btn:hover {
-  background-color: #3730A3;
+.primary-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3730A3 0%, #312E81 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.primary-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.primary-btn:disabled {
+  background: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
 }
 
 .save-status {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--success-color);
+  text-align: center;
   opacity: 0;
   transition: opacity 0.3s;
+  padding: 4px 0;
 }
 
 .save-status.show {
@@ -290,7 +359,7 @@ textarea {
 }
 
 .filter-section.disabled {
-  opacity: 0.4;
+  position: relative;
   pointer-events: none;
 }
 
@@ -300,23 +369,24 @@ textarea {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(79, 70, 229, 0.95);
+  background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);
   color: white;
-  padding: 12px 20px;
-  border-radius: 20px;
-  font-size: 13px;
+  padding: 14px 24px;
+  border-radius: 24px;
   font-weight: 600;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 10;
-  pointer-events: auto;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  pointer-events: auto;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .filter-section.disabled::after:hover {
-  background: rgba(55, 48, 163, 0.95);
-  transform: translate(-50%, -50%) scale(1.02);
+  transform: translate(-50%, -50%) scale(1.05);
+  background: linear-gradient(135deg, #3730A3 0%, #312E81 100%);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.5);
 }
 
 .filter-section.disabled::before {
@@ -326,10 +396,10 @@ textarea {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(2px);
   border-radius: 8px;
-  z-index: 9;
+  z-index: 1;
 }
 
 /* Make other sections also slightly dimmed */

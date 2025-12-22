@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Elements
-  const modeRadios = document.getElementsByName('mode');
+  const modeToggle = document.getElementById('modeToggle');
+  const modeText = document.getElementById('modeText');
   const filterSection = document.getElementById('filterSection');
-  const statusBadge = document.getElementById('statusBadge');
 
   const hideShortText = document.getElementById('hideShortText');
   const showOnlyImage = document.getElementById('showOnlyImage');
@@ -37,12 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load Settings
   chrome.storage.sync.get(defaultSettings, (items) => {
-    // Set Mode
-    for (const radio of modeRadios) {
-      if (radio.value === items.mode) {
-        radio.checked = true;
-      }
-    }
+    // Set Mode Toggle
+    modeToggle.checked = items.mode === 'clean';
     updateUIState(items.mode);
 
     // Set Filters
@@ -61,39 +57,46 @@ document.addEventListener('DOMContentLoaded', () => {
     maxRetweets.value = items.maxRetweets || '';
   });
 
-  // Event Listeners for Mode
-  for (const radio of modeRadios) {
-    radio.addEventListener('change', (e) => {
-      const newMode = e.target.value;
-      updateUIState(newMode);
+  // Event Listener for Mode Toggle
+  modeToggle.addEventListener('change', (e) => {
+    const newMode = e.target.checked ? 'clean' : 'original';
+    updateUIState(newMode);
 
-      // Auto-save mode change immediately
-      chrome.storage.sync.get(defaultSettings, (currentSettings) => {
-        const updatedSettings = {
-          ...currentSettings,
-          mode: newMode
-        };
+    // Auto-save mode change immediately
+    chrome.storage.sync.get(defaultSettings, (currentSettings) => {
+      const updatedSettings = {
+        ...currentSettings,
+        mode: newMode
+      };
 
-        chrome.storage.sync.set(updatedSettings, () => {
-          showStatus('模式已切换');
-          // Notify content script immediately
+      chrome.storage.sync.set(updatedSettings, () => {
+        showStatus('模式已切换');
+        // Reload the page to apply mode change
+        try {
           chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0]?.url?.includes('x.com')) {
-              chrome.tabs.sendMessage(tabs[0].id, {
-                action: 'updateSettings',
-                settings: updatedSettings
+            if (chrome.runtime.lastError) {
+              console.log('PureFeed: Tab query error:', chrome.runtime.lastError);
+              return;
+            }
+            if (tabs && tabs[0] && tabs[0].url && tabs[0].url.includes('x.com')) {
+              chrome.tabs.reload(tabs[0].id, () => {
+                if (chrome.runtime.lastError) {
+                  console.log('PureFeed: Reload error:', chrome.runtime.lastError);
+                }
               });
             }
           });
-        });
+        } catch (err) {
+          console.log('PureFeed: Error in mode toggle:', err);
+        }
       });
     });
-  }
+  });
 
   // Save Button
   saveBtn.addEventListener('click', () => {
     const settings = {
-      mode: document.querySelector('input[name="mode"]:checked').value,
+      mode: modeToggle.checked ? 'clean' : 'original',
       hideShortText: hideShortText.checked,
       showOnlyImage: showOnlyImage.checked,
       showOnlyVideo: showOnlyVideo.checked,
@@ -110,12 +113,23 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.sync.set(settings, () => {
       showStatus('设置已保存');
       // Notify content script and reload the page to apply new filters
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0]?.url?.includes('x.com')) {
-          // Reload the page to apply new filter settings
-          chrome.tabs.reload(tabs[0].id);
-        }
-      });
+      try {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (chrome.runtime.lastError) {
+            console.log('PureFeed: Tab query error:', chrome.runtime.lastError);
+            return;
+          }
+          if (tabs && tabs[0] && tabs[0].url && tabs[0].url.includes('x.com')) {
+            chrome.tabs.reload(tabs[0].id, () => {
+              if (chrome.runtime.lastError) {
+                console.log('PureFeed: Reload error:', chrome.runtime.lastError);
+              }
+            });
+          }
+        });
+      } catch (err) {
+        console.log('PureFeed: Error in save:', err);
+      }
       // Badge will be updated automatically via storage.onChanged in background.js
     });
   });
@@ -129,31 +143,31 @@ document.addEventListener('DOMContentLoaded', () => {
       filterSection.classList.add('disabled');
       languageSection?.classList.add('disabled');
       engagementSection?.classList.add('disabled');
-      statusBadge.textContent = '原始模式';
-      statusBadge.classList.add('original');
+      modeText.textContent = '原始模式';
+      modeText.style.color = '#536471';
+      // Disable save button in original mode
+      saveBtn.disabled = true;
 
-      // Add click handler to overlay to switch to clean mode
-      filterSection.addEventListener('click', switchToCleanMode);
+      // Add click handler to switch mode
+      filterSection.onclick = handleOverlayClick;
     } else {
       filterSection.classList.remove('disabled');
       languageSection?.classList.remove('disabled');
       engagementSection?.classList.remove('disabled');
-      statusBadge.textContent = '精简模式';
-      statusBadge.classList.remove('original');
+      modeText.textContent = '精简模式';
+      modeText.style.color = 'var(--primary-color)';
+      // Enable save button in clean mode
+      saveBtn.disabled = false;
 
       // Remove click handler
-      filterSection.removeEventListener('click', switchToCleanMode);
+      filterSection.onclick = null;
     }
   }
 
-  function switchToCleanMode() {
-    // Find and click the clean mode radio button
-    const cleanRadio = document.querySelector('input[name="mode"][value="clean"]');
-    if (cleanRadio && !cleanRadio.checked) {
-      cleanRadio.checked = true;
-      // Trigger change event to auto-save
-      cleanRadio.dispatchEvent(new Event('change'));
-    }
+  function handleOverlayClick() {
+    // Switch to clean mode
+    modeToggle.checked = true;
+    modeToggle.dispatchEvent(new Event('change'));
   }
 
   function showStatus(msg) {

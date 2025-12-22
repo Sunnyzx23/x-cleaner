@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PureFeed - Live Usage Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            width: 1280px;
+            height: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .browser-window {
+            width: 1240px;
+            height: 760px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .browser-toolbar {
+            height: 60px;
+            background: linear-gradient(180deg, #f5f5f5 0%, #e5e5e5 100%);
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 10px;
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red {
+            background: #ff5f56;
+        }
+
+        .dot-yellow {
+            background: #ffbd2e;
+        }
+
+        .dot-green {
+            background: #27c93f;
+        }
+
+        .address-bar {
+            flex: 1;
+            height: 36px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 10px;
+        }
+
+        .lock-icon {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .url {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .extension-icon {
+            width: 36px;
+            height: 36px;
+            background: url('../icons/icon48.png') center/cover;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .extension-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            min-width: 24px;
+            height: 18px;
+            background: #10b981;
+            border-radius: 10px;
+            border: 2px solid #f5f5f5;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            color: white;
+        }
+
+        .x-interface {
+            flex: 1;
+            background: #000;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #000;
+            border-right: 1px solid #2f3336;
+            padding: 10px;
+        }
+
+        .logo {
+            width: 30px;
+            height: 30px;
+            margin: 10px 15px;
+            color: white;
+            font-size: 28px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            color: white;
+            font-size: 19px;
+            border-radius: 25px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-item:hover {
+            background: #16181c;
+        }
+
+        .main-content {
+            flex: 1;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .timeline-header {
+            height: 53px;
+            border-bottom: 1px solid #2f3336;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .filter-indicator {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid #10b981;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        .timeline {
+            overflow-y: auto;
+            height: calc(100% - 53px);
+        }
+
+        .tweet {
+            border-bottom: 1px solid #2f3336;
+            padding: 12px 16px;
+            color: white;
+            transition: background 0.2s;
+        }
+
+        .tweet:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tweet-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .author-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .author-handle {
+            color: #71767b;
+            font-size: 15px;
+            margin-left: 4px;
+        }
+
+        .tweet-text {
+            font-size: 15px;
+            line-height: 20px;
+            margin-bottom: 12px;
+            color: #e7e9ea;
+        }
+
+        .tweet-media {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tweet-media::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 60%;
+            background: repeating-linear-gradient(90deg,
+                    rgba(255, 255, 255, 0.1) 0px,
+                    rgba(255, 255, 255, 0.1) 20px,
+                    transparent 20px,
+                    transparent 40px);
+        }
+
+        .tweet-media::after {
+            content: '';
+            position: absolute;
+            bottom: 20%;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tweet-stats {
+            display: flex;
+            gap: 60px;
+            color: #71767b;
+            font-size: 13px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-high {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .rightbar {
+            width: 350px;
+            background: #000;
+            border-left: 1px solid #2f3336;
+            padding: 10px;
+        }
+
+        .search-box {
+            background: #202327;
+            border-radius: 25px;
+            padding: 12px 16px;
+            color: #71767b;
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        .card {
+            background: #16181c;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .trending-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #2f3336;
+        }
+
+        .trending-category {
+            font-size: 13px;
+            color: #71767b;
+        }
+
+        .trending-topic {
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+            margin: 4px 0;
+        }
+
+        .trending-posts {
+            font-size: 13px;
+            color: #71767b;
+        }
+
+        .overlay-hint {
+            position: absolute;
+            top: 100px;
+            /* Adjusted for visibility within the interface */
+            right: 30px;
+            /* Adjusted for visibility within the interface */
+            background: rgba(16, 185, 129, 0.95);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+            z-index: 1000;
+            max-width: 280px;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.03);
+                opacity: 0.9;
+            }
+        }
+
+        .arrow-pointer {
+            position: absolute;
+            top: 70px;
+            right: 120px;
+            font-size: 32px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="browser-window">
+        <!-- Browser Toolbar -->
+        <div class="browser-toolbar">
+            <div class="browser-dots">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+            </div>
+            <div class="address-bar">
+                <span class="lock-icon">🔒</span>
+                <span class="url">x.com/home</span>
+            </div>
+            <div class="extension-icon">
+                <div class="extension-badge">ON</div>
+            </div>
+        </div>
+
+        <!-- X Interface -->
+        <div class="x-interface">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="logo">𝕏</div>
+                <div class="nav-item">🏠 主页</div>
+                <div class="nav-item">🔍 探索</div>
+                <div class="nav-item">🔔 通知</div>
+                <div class="nav-item">✉️ 私信</div>
+            </div>
+
+            <!-- Main Timeline -->
+            <div class="main-content">
+                <div class="timeline-header">
+                    为你推荐
+                    <div class="filter-indicator">
+                        ✨ 已过滤85%低质内容
+                    </div>
+                </div>
+                <div class="timeline">
+                    <div class="tweet">
+                        <div class="tweet-author">
+                            <div class="author-avatar"></div>
+                            <div>
+                                <span class="author-name">AI Research Lab</span>
+                                <span class="author-handle">@ai_lab</span>
+                            </div>
+                        </div>
+                        <div class="tweet-text">
+                            深度解析 GPT-5 的技术突破：从Transformer架构到多模态融合。本文将详细介绍最新的注意力机制优化、训练效率提升和应用场景扩展。附完整技术报告和实验数据分析...
+                        </div>
+                        <div class="tweet-media">📊</div>
+                        <div class="tweet-stats">
+                            <div class="stat stat-high">❤️ 8.5K</div>
+                            <div class="stat stat-high">🔄 2.3K</div>
+                            <div class="stat stat-high">💬 456</div>
+                        </div>
+                    </div>
+
+                    <div class="tweet">
+                        <div class="tweet-author">
+                            <div class="author-avatar"></div>
+                            <div>
+                                <span class="author-name">设计美学</span>
+                                <span class="author-handle">@design_weekly</span>
+                            </div>
+                        </div>
+                        <div class="tweet-text">
+                            2024年UI设计趋势完整指南：玻璃拟态、新拟物化、动态岛设计的实战应用。包含20+案例分析和Figma源文件。设计师必读！🎨
+                        </div>
+                        <div class="tweet-stats">
+                            <div class="stat stat-high">❤️ 5.2K</div>
+                            <div class="stat stat-high">🔄 1.8K</div>
+                            <div class="stat stat-high">💬 234</div>
+                        </div>
+                    </div>
+
+                    <div class="tweet">
+                        <div class="tweet-author">
+                            <div class="author-avatar"></div>
+                            <div>
+                                <span class="author-name">TechCrunch</span>
+                                <span class="author-handle">@techcrunch</span>
+                            </div>
+                        </div>
+                        <div class="tweet-text">
+                            Breaking: 硅谷最新独角兽公司融资3.5亿美元，估值达25亿。创始团队来自Google和OpenAI，专注于企业级AI解决方案。详细报道↓
+                        </div>
+                        <div class="tweet-media">🚀</div>
+                        <div class="tweet-stats">
+                            <div class="stat stat-high">❤️ 12.8K</div>
+                            <div class="stat stat-high">🔄 4.5K</div>
+                            <div class="stat stat-high">💬 892</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="rightbar">
+                <div class="search-box">
+                    🔍 搜索
+                </div>
+                <div class="card">
+                    <div class="card-title">正在发生</div>
+                    <div class="trending-item">
+                        <div class="trending-category">科技 · 热门</div>
+                        <div class="trending-topic">#AI技术</div>
+                        <div class="trending-posts">45.2K 推文</div>
+                    </div>
+                    <div class="trending-item">
+                        <div class="trending-category">商业 · 热门</div>
+                        <div class="trending-topic">#创业投资</div>
+                        <div class="trending-posts">28.7K 推文</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>

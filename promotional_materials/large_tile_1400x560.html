@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PureFeed - Large Promotional Tile (1400x560)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <title>PureFeed - 极简推文过滤</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,331 +15,304 @@
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background: #0F172A;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            overflow: hidden;
-        }
-
-        .tile {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             width: 1400px;
             height: 560px;
-            background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
-            position: relative;
-            overflow: hidden;
             display: flex;
-            flex-direction: row;
             align-items: center;
-            padding: 40px 60px;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
 
-        /* Subtle decorative background */
-        .tile::before {
-            content: '';
+        /* Animated background particles */
+        .particle {
             position: absolute;
-            top: -10%;
-            right: -5%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .left-section {
-            flex: 0 0 40%;
-            z-index: 2;
-        }
-
-        .header {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
+            padding: 60px;
             display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 35px;
-        }
-
-        .logo-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 20px;
-            object-fit: cover;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-            filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
-        }
-
-        .header-text {
-            text-align: left;
-        }
-
-        .logo {
-            font-size: 48px;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 5px;
-            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.95);
-            font-weight: 500;
-        }
-
-        .features-list {
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .feature-icon-wrapper {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            font-size: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .comparison-container {
-            flex: 1;
-            display: flex;
-            gap: 15px;
-            z-index: 2;
-        }
-
-        .comparison-side {
-            flex: 1;
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
             position: relative;
             overflow: hidden;
         }
 
-        .comparison-label {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
+        .right-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%);
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-label {
+            font-size: 28px;
+            font-weight: 800;
             color: white;
-            padding: 6px 15px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 700;
-            z-index: 10;
-            letter-spacing: 0.3px;
-        }
-
-        .before .comparison-label {
-            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
-            box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
-        }
-
-        .after .comparison-label {
-            background: linear-gradient(135deg, #51CF66 0%, #40C057 100%);
-            box-shadow: 0 3px 12px rgba(81, 207, 102, 0.3);
-        }
-
-        .timeline-mock {
-            margin-top: 35px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .tweet-mock {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-left: 3px solid #ddd;
-            transition: all 0.2s;
-        }
-
-        .before .tweet-mock {
-            opacity: 0.7;
-        }
-
-        .before .tweet-mock:nth-child(2),
-        .before .tweet-mock:nth-child(4) {
-            background: linear-gradient(135deg, #FFE8E8 0%, #FFD8D8 100%);
-            border-left-color: #FF6B6B;
-            opacity: 0.5;
-        }
-
-        .after .tweet-mock {
-            border-left-color: #4A90E2;
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-        }
-
-        .tweet-header {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            margin-bottom: 6px;
-        }
-
-        .avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .username {
-            font-weight: 600;
-            font-size: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            font-size: 13px;
             color: #333;
-        }
-
-        .tweet-content {
-            font-size: 11px;
-            color: #555;
             line-height: 1.4;
         }
 
-        .tweet-short {
-            height: 12px;
-            background: linear-gradient(90deg, #ddd 0%, #e8e8e8 100%);
-            border-radius: 4px;
-            width: 60%;
+        .tweet-mock.short {
+            opacity: 0.8;
+            font-size: 12px;
+            color: #666;
         }
 
-        .arrow-container {
+        .tweet-mock.quality {
+            border-left: 4px solid #10b981;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .divider {
             position: absolute;
-            top: 50%;
             left: 50%;
+            top: 50%;
             transform: translate(-50%, -50%);
-            z-index: 5;
+            width: 140px;
+            height: 140px;
             background: white;
-            width: 48px;
-            height: 48px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+            z-index: 10;
         }
 
         .arrow {
-            font-size: 26px;
-            color: #4A90E2;
-            font-weight: bold;
+            font-size: 64px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-title {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 5;
+        }
+
+        .title-text {
+            font-size: 64px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .title-subtitle {
+            font-size: 24px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            margin-top: 10px;
+        }
+
+        .bottom-stats {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 5;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .icon-logo {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: 900;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.5);
+            z-index: 5;
         }
     </style>
 </head>
 
 <body>
-    <div class="tile">
+    <!-- Animated particles -->
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 2.5s;"></div>
+    <div class="particle" style="left: 80%; animation-delay: 4.5s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 1.5s;"></div>
+
+    <div class="container">
+        <!-- Left: Before -->
         <div class="left-section">
-            <div class="header">
-                <img src="icon128.png" alt="PureFeed Logo" class="logo-image">
-                <div class="header-text">
-                    <div class="logo">PureFeed</div>
-                    <div class="subtitle">智能过滤，纯净体验</div>
-                </div>
-            </div>
-
-            <ul class="features-list">
-                <li class="feature-item">
-                    <div class="feature-icon-wrapper">
-                        <span>📝</span>
-                    </div>
-                    <span>短文本过滤</span>
-                </li>
-                <li class="feature-item">
-                    <div class="feature-icon-wrapper">
-                        <span>🖼️</span>
-                    </div>
-                    <span>媒体筛选</span>
-                </li>
-                <li class="feature-item">
-                    <div class="feature-icon-wrapper">
-                        <span>🌐</span>
-                    </div>
-                    <span>语言过滤</span>
-                </li>
-                <li class="feature-item">
-                    <div class="feature-icon-wrapper">
-                        <span>📊</span>
-                    </div>
-                    <span>互动量过滤</span>
-                </li>
-            </ul>
+            <span>📝</span>
         </div>
+        <span>短文本过滤</span>
+        </li>
+        <li class="feature-item">
+            <div class="feature-icon-wrapper">
+                <span>🖼️</span>
+            </div>
+            <span>媒体筛选</span>
+        </li>
+        <li class="feature-item">
+            <div class="feature-icon-wrapper">
+                <span>🌐</span>
+            </div>
+            <span>语言过滤</span>
+        </li>
+        <li class="feature-item">
+            <div class="feature-icon-wrapper">
+                <span>📊</span>
+            </div>
+            <span>互动量过滤</span>
+        </li>
+        </ul>
+    </div>
 
-        <div class="comparison-container">
-            <div class="comparison-side before">
-                <div class="comparison-label">过滤前 Before</div>
-                <div class="timeline-mock">
-                    <div class="tweet-mock">
-                        <div class="tweet-header">
-                            <div class="avatar"></div>
-                            <div class="username">User Name</div>
-                        </div>
-                        <div class="tweet-content">This is a quality tweet with meaningful content...</div>
+    <div class="comparison-container">
+        <div class="comparison-side before">
+            <div class="comparison-label">过滤前 Before</div>
+            <div class="timeline-mock">
+                <div class="tweet-mock">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div class="username">User Name</div>
                     </div>
-                    <div class="tweet-mock">
-                        <div class="tweet-header">
-                            <div class="avatar"></div>
-                            <div class="username">Spam Account</div>
-                        </div>
-                        <div class="tweet-short"></div>
-                    </div>
-                    <div class="tweet-mock">
-                        <div class="tweet-header">
-                            <div class="avatar"></div>
-                            <div class="username">Good Content</div>
-                        </div>
-                        <div class="tweet-content">Interesting article about AI...</div>
-                    </div>
-                    <div class="tweet-mock">
-                        <div class="tweet-header">
-                            <div class="avatar"></div>
-                            <div class="username">Crypto Spam</div>
-                        </div>
-                        <div class="tweet-short"></div>
-                    </div>
+                    <div class="tweet-content">This is a quality tweet with meaningful content...</div>
                 </div>
-            </div>
-
-            <div class="arrow-container">
-                <div class="arrow">→</div>
-            </div>
-
-            <div class="comparison-side after">
-                <div class="comparison-label">过滤后 After</div>
-                <div class="timeline-mock">
-                    <div class="tweet-mock">
-                        <div class="tweet-header">
-                            <div class="avatar"></div>
-                            <div class="username">User Name</div>
-                        </div>
-                        <div class="tweet-content">This is a quality tweet with meaningful content...</div>
+                <div class="tweet-mock">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div class="username">Spam Account</div>
                     </div>
-                    <div class="tweet-mock">
-                        <div class="tweet-header">
-                            <div class="avatar"></div>
-                            <div class="username">Good Content</div>
-                        </div>
-                        <div class="tweet-content">Interesting article about AI...</div>
+                    <div class="tweet-short"></div>
+                </div>
+                <div class="tweet-mock">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div class="username">Good Content</div>
                     </div>
+                    <div class="tweet-content">Interesting article about AI...</div>
+                </div>
+                <div class="tweet-mock">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div class="username">Crypto Spam</div>
+                    </div>
+                    <div class="tweet-short"></div>
                 </div>
             </div>
         </div>
+
+        <div class="arrow-container">
+            <div class="arrow">→</div>
+        </div>
+
+        <div class="comparison-side after">
+            <div class="comparison-label">过滤后 After</div>
+            <div class="timeline-mock">
+                <div class="tweet-mock">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div class="username">User Name</div>
+                    </div>
+                    <div class="tweet-content">This is a quality tweet with meaningful content...</div>
+                </div>
+                <div class="tweet-mock">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div class="username">Good Content</div>
+                    </div>
+                    <div class="tweet-content">Interesting article about AI...</div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 </body>
 

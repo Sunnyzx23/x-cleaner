@@ -108,6 +108,57 @@ function observeNewTweets() {
         document.querySelectorAll('article[data-testid="tweet"]').forEach(processTweet);
         scheduleNotificationUpdate();
     }, 500);
+
+    // Also observe and hide "Show replies" links
+    hideShowRepliesLinks();
+}
+
+// Hide "Show more replies" and similar low-value prompts
+function hideShowRepliesLinks() {
+    // Only hide in clean mode
+    if (settings.mode === 'original') return;
+
+    const observer = new MutationObserver(() => {
+        // Hide "Show replies" and "Show more replies" links
+        const repliesLinks = document.querySelectorAll('a[href*="/status/"]');
+
+        repliesLinks.forEach(link => {
+            const text = link.textContent.toLowerCase();
+            if (text.includes('show') && (text.includes('replies') || text.includes('more replies'))) {
+                const container = link.closest('[role="link"]') || link.parentElement;
+                if (container && !container.hasAttribute('data-x-hidden')) {
+                    container.style.display = 'none';
+                    container.setAttribute('data-x-hidden', 'true');
+                }
+            }
+        });
+
+        // Also hide promotional "Show more" buttons in timeline
+        const showMoreButtons = document.querySelectorAll('[role="button"]');
+        showMoreButtons.forEach(btn => {
+            const text = btn.textContent.toLowerCase();
+            if (text === 'show' || text === 'show more' || text.includes('show more replies')) {
+                if (!btn.hasAttribute('data-x-hidden')) {
+                    btn.style.display = 'none';
+                    btn.setAttribute('data-x-hidden', 'true');
+                }
+            }
+        });
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    // Run once immediately
+    setTimeout(() => {
+        observer.disconnect();
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }, 0);
 }
 
 // Process a single tweet - returns true if newly processed

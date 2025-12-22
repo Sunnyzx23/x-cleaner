@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PureFeed - Before/After Comparison</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            width: 1280px;
+            height: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 800px;
+            width: 1280px;
+            position: relative;
+        }
+
+        .side {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            padding: 90px 40px 40px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side-before {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .side-after {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .label {
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 4px 8px rgba(0, 0, 0, 0.7);
+            letter-spacing: -0.5px;
+        }
+
+        .tweet-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .tweet {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 16px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 15px;
+            color: #1a1a1a;
+        }
+
+        .handle {
+            color: #666;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+
+        .tweet-content {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .tweet-short {
+            opacity: 0.75;
+        }
+
+        .tweet-short .tweet-content {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .tweet-long {
+            border-left: 3px solid #10b981;
+        }
+
+        .tweet-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .stat-low {
+            opacity: 0.6;
+        }
+
+        .divider {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .arrow {
+            font-size: 48px;
+            color: #1a1a2e;
+            font-weight: 800;
+        }
+
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 42px;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 8px 24px rgba(0, 0, 0, 0.9), 0 4px 8px rgba(0, 0, 0, 0.7);
+            z-index: 15;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 5;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 18px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Before Side -->
+        <div class="side side-before">
+            <div class="label">❌ 过滤前</div>
+            <div class="tweet-list">
+                <div class="tweet tweet-short">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">用户A</span>
+                            <span class="handle">@userA</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">今天天气不错</div>
+                    <div class="tweet-stats">
+                        <span class="stat-low">❤️ 3</span>
+                        <span class="stat-low">💬 0</span>
+                    </div>
+                </div>
+
+                <div class="tweet tweet-short">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">广告账号</span>
+                            <span class="handle">@ad_bot</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">🔥限时优惠！点击购买...</div>
+                    <div class="tweet-stats">
+                        <span class="stat-low">❤️ 1</span>
+                    </div>
+                </div>
+
+                <div class="tweet tweet-short">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">无聊用户</span>
+                            <span class="handle">@boring</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">哈哈哈哈</div>
+                    <div class="tweet-stats">
+                        <span class="stat-low">❤️ 2</span>
+                    </div>
+                </div>
+
+                <div class="tweet">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">Tech Expert</span>
+                            <span class="handle">@techexp</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">深度分析：AI技术的最新发展趋势。企业如何利用大语言模型提升效率...</div>
+                    <div class="tweet-stats">
+                        <span>❤️ 2.5K</span>
+                        <span>🔄 523</span>
+                    </div>
+                </div>
+
+                <div class="tweet tweet-short">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">随便说说</span>
+                            <span class="handle">@random</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">😂😂😂</div>
+                    <div class="tweet-stats">
+                        <span class="stat-low">❤️ 5</span>
+                    </div>
+                </div>
+
+                <div class="tweet tweet-short">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">水军</span>
+                            <span class="handle">@spam123</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">关注我！</div>
+                    <div class="tweet-stats">
+                        <span class="stat-low">❤️ 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- After Side -->
+        <div class="side side-after">
+            <div class="label">✅ 过滤后</div>
+            <div class="tweet-list">
+                <div class="tweet tweet-long">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">Tech Expert</span>
+                            <span class="handle">@techexp</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">深度分析：AI技术的最新发展趋势。企业如何利用大语言模型提升效率，降低成本。本文将从技术原理、应用案例、未来展望三个维度进行详细解读...
+                    </div>
+                    <div class="tweet-stats">
+                        <span>❤️ 2.5K</span>
+                        <span>🔄 523</span>
+                        <span>💬 156</span>
+                    </div>
+                </div>
+
+                <div class="tweet tweet-long">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">设计师日记</span>
+                            <span class="handle">@designer</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">分享一个UI设计的完整流程：从用户研究到最终交付。包含了我在实际项目中的经验总结和踩过的坑，希望对新手设计师有帮助...</div>
+                    <div class="tweet-stats">
+                        <span>❤️ 1.8K</span>
+                        <span>🔄 342</span>
+                        <span>💬 89</span>
+                    </div>
+                </div>
+
+                <div class="tweet tweet-long">
+                    <div class="tweet-header">
+                        <div class="avatar"></div>
+                        <div>
+                            <span class="username">金融分析师</span>
+                            <span class="handle">@finance_pro</span>
+                        </div>
+                    </div>
+                    <div class="tweet-content">2024年全球经济形势分析：通胀、加息、地缘政治如何影响投资策略。基于历史数据和当前趋势，给出3个可行的资产配置建议...</div>
+                    <div class="tweet-stats">
+                        <span>❤️ 3.2K</span>
+                        <span>🔄 687</span>
+                        <span>💬 234</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="divider">
+            <div class="arrow">→</div>
+        </div>
+
+        <!-- Title -->
+        <div class="title">PureFeed 让时间线回归纯净</div>
+
+        <!-- Subtitle -->
+        <div class="subtitle">
+            <span class="badge">智能过滤 60% 低价值内容</span>
+            <span class="badge" style="margin-left: 15px;">节省 80% 浏览时间</span>
+        </div>
+    </div>
+</body>
+
+</html>
