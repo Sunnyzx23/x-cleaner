@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "PureFeed - 极简推文过滤",
-  "version": "1.2.0",
-  "description": "一键开启纯净模式，过滤X/Twitter低价值短内容。支持媒体类型、语言和互动量筛选，让时间线回归本质。",
+  "version": "2.0.0",
+  "description": "智能过滤X/Twitter推文：白名单优先、认证过滤、内容筛选三层架构。支持账号白名单、只显示认证账号、媒体类型、语言和互动量过滤，打造专属纯净时间线。",
   "permissions": [
     "storage"
   ],

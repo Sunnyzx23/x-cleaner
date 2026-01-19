@@ -1,7 +1,7 @@
 // PureFeed - Content Script
-// Architecture v2.1 - Optimized for scroll stability
+// Architecture v2 - Stable and reliable
 
-console.log('PureFeed: Content script loaded v2.1');
+console.log('PureFeed: Content script loaded v2');
 
 // Settings
 let settings = {
@@ -30,9 +30,6 @@ let whitelistSet = new Set();
 
 // Debounce timer for notifications
 let notificationDebounce = null;
-
-// Processing queue to avoid race conditions
-let processingQueue = new Set();
 
 // Initialize
 function init() {
@@ -93,32 +90,24 @@ function updateAllTweetVisibility() {
     scheduleNotificationUpdate();
 }
 
-// Observe new tweets - OPTIMIZED
+// Observe new tweets
 function observeNewTweets() {
     const observer = new MutationObserver((mutations) => {
         let hasNewTweets = false;
-
-        // Batch process all mutations
-        const tweetsToProcess = new Set();
 
         mutations.forEach(mutation => {
             mutation.addedNodes.forEach(node => {
                 if (node.nodeType === 1) {
                     if (node.matches && node.matches('article[data-testid="tweet"]')) {
-                        tweetsToProcess.add(node);
+                        if (processTweet(node)) hasNewTweets = true;
                     } else if (node.querySelectorAll) {
                         const tweets = node.querySelectorAll('article[data-testid="tweet"]');
-                        tweets.forEach(t => tweetsToProcess.add(t));
+                        tweets.forEach(t => {
+                            if (processTweet(t)) hasNewTweets = true;
+                        });
                     }
                 }
             });
-        });
-
-        // Process tweets immediately to avoid race conditions
-        tweetsToProcess.forEach(tweet => {
-            if (processTweetImmediate(tweet)) {
-                hasNewTweets = true;
-            }
         });
 
         if (hasNewTweets) {
@@ -126,7 +115,6 @@ function observeNewTweets() {
         }
     });
 
-    // Only observe childList, not subtree changes
     observer.observe(document.body, {
         childList: true,
         subtree: true
@@ -134,7 +122,7 @@ function observeNewTweets() {
 
     // Process existing tweets on page
     setTimeout(() => {
-        document.querySelectorAll('article[data-testid="tweet"]').forEach(processTweetImmediate);
+        document.querySelectorAll('article[data-testid="tweet"]').forEach(processTweet);
         scheduleNotificationUpdate();
     }, 500);
 
@@ -179,53 +167,59 @@ function hideShowRepliesLinks() {
         childList: true,
         subtree: true
     });
+
+    // Run once immediately
+    setTimeout(() => {
+        observer.disconnect();
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }, 0);
 }
 
-// Process tweet IMMEDIATELY - no setTimeout delays
-function processTweetImmediate(tweet) {
-    // Skip if already processed
+// Process a single tweet - returns true if newly processed
+function processTweet(tweet) {
+    // Skip if already processed or pending
     const status = tweet.getAttribute('data-x-processed');
-    if (status === 'done') {
+    if (status) {
         return false;
     }
 
-    // Prevent concurrent processing
-    if (processingQueue.has(tweet)) {
-        return false;
-    }
+    // Mark as pending
+    tweet.setAttribute('data-x-processed', 'pending');
 
-    processingQueue.add(tweet);
-
-    try {
-        // Mark as done immediately
+    // Skip in original mode
+    if (settings.mode === 'original') {
         tweet.setAttribute('data-x-processed', 'done');
-
-        // Skip in original mode
-        if (settings.mode === 'original') {
-            processingQueue.delete(tweet);
-            return true;
-        }
-
-        // Skip on single tweet pages
-        if (window.location.pathname.includes('/status/')) {
-            processingQueue.delete(tweet);
-            return true;
-        }
-
-        // Extract and cache data IMMEDIATELY
-        const data = extractTweetData(tweet);
-        tweetDataCache.set(tweet, data);
-
-        // Apply visibility IMMEDIATELY
-        applyVisibility(tweet, data);
-
-        processingQueue.delete(tweet);
         return true;
-    } catch (error) {
-        console.warn('PureFeed: Error processing tweet', error);
-        processingQueue.delete(tweet);
-        return false;
     }
+
+    // Skip on single tweet pages
+    if (window.location.pathname.includes('/status/')) {
+        tweet.setAttribute('data-x-processed', 'done');
+        return true;
+    }
+
+    // Wait for lazy-loaded media, then process
+    setTimeout(() => {
+        finalizeTweet(tweet);
+    }, 300);
+
+    return true;
+}
+
+// Finalize tweet processing after media loads
+function finalizeTweet(tweet) {
+    // Extract and cache data
+    const data = extractTweetData(tweet);
+    tweetDataCache.set(tweet, data);
+
+    // Apply visibility
+    applyVisibility(tweet, data);
+
+    // Mark as done
+    tweet.setAttribute('data-x-processed', 'done');
 }
 
 // Apply visibility based on filter results
@@ -233,99 +227,33 @@ function applyVisibility(tweet, data) {
     const shouldHide = applyFilters(data);
 
     if (shouldHide) {
-        tweet.style.display = 'none';
+        tweet.style.visibility = 'hidden';
+        tweet.style.height = '0';
+        tweet.style.overflow = 'hidden';
+        tweet.style.margin = '0';
+        tweet.style.padding = '0';
     } else {
-        tweet.style.display = '';
-    }
-}
-
-// Extract username from tweet
-function extractUsername(tweet) {
-    try {
-        const userArea = tweet.querySelector('[data-testid="User-Name"]');
-        if (!userArea) return null;
-
-        const usernameLink = userArea.querySelector('a[href^="/"]');
-        if (!usernameLink) return null;
-
-        const href = usernameLink.getAttribute('href');
-        if (!href) return null;
-
-        const username = href.substring(1).split('/')[0];
-        return username ? username.toLowerCase() : null;
-    } catch (e) {
-        console.warn('PureFeed: Failed to extract username', e);
-        return null;
-    }
-}
-
-// Detect verification status
-function detectVerification(tweet) {
-    try {
-        const userArea = tweet.querySelector('[data-testid="User-Name"]');
-        if (!userArea) return { isVerified: false, verificationType: null };
-
-        const verifiedBadge = userArea.querySelector('svg[aria-label*="Verified"]') ||
-            userArea.querySelector('svg[aria-label*="verified"]') ||
-            userArea.querySelector('svg[aria-label*="订阅"]') ||
-            userArea.querySelector('svg[data-testid*="verified"]');
-
-        if (!verifiedBadge) return { isVerified: false, verificationType: null };
-
-        const ariaLabel = (verifiedBadge.getAttribute('aria-label') || '').toLowerCase();
-
-        if (ariaLabel.includes('verified') || ariaLabel.includes('subscriber') || ariaLabel.includes('订阅')) {
-            return { isVerified: true, verificationType: 'blue' };
-        }
-
-        if (ariaLabel.includes('business') || ariaLabel.includes('organization')) {
-            return { isVerified: true, verificationType: 'gold' };
-        }
-
-        if (ariaLabel.includes('government') || ariaLabel.includes('official')) {
-            return { isVerified: true, verificationType: 'government' };
-        }
-
-        return { isVerified: true, verificationType: 'blue' };
-    } catch (e) {
-        console.warn('PureFeed: Failed to detect verification', e);
-        return { isVerified: false, verificationType: null };
+        tweet.style.visibility = 'visible';
+        tweet.style.height = '';
+        tweet.style.overflow = '';
+        tweet.style.margin = '';
+        tweet.style.padding = '';
     }
 }
 
 // Extract tweet data
 function extractTweetData(tweet) {
-    // Extract username
-    const username = extractUsername(tweet);
-
-    // Check if in whitelist
-    const isWhitelisted = username ? whitelistSet.has(username) : false;
-
-    // Detect verification
-    const verificationInfo = detectVerification(tweet);
-
     // Text
     const textNode = tweet.querySelector('[data-testid="tweetText"]');
     const text = textNode ? textNode.innerText : '';
 
-    // Media detection - ENHANCED to handle lazy loading
-    // Check multiple indicators to catch media before it's fully loaded
+    // Media detection
     const videoElement = tweet.querySelector('video');
-    const videoPlayer = tweet.querySelector('[data-testid="videoPlayer"]');
-    const videoContainer = tweet.querySelector('[aria-label*="video" i]') ||
-        tweet.querySelector('[aria-label*="視頻" i]') ||
-        tweet.querySelector('[aria-label*="视频" i]');
-
     const tweetPhoto = tweet.querySelector('[data-testid="tweetPhoto"]');
-    const imageContainer = tweet.querySelector('[aria-label*="image" i]') ||
-        tweet.querySelector('[aria-label*="图片" i]') ||
-        tweet.querySelector('img[alt*="Image" i]');
+    const videoPlayer = tweet.querySelector('[data-testid="videoPlayer"]');
 
-    // Enhanced detection: check for any video-related elements
-    const hasVideo = !!videoPlayer || !!videoElement || !!videoContainer;
-
-    // Enhanced detection: check for any image-related elements, but not if it's a video
-    const hasImage = !hasVideo && (!!tweetPhoto || !!imageContainer);
+    const hasVideo = !!videoPlayer || !!videoElement;
+    const hasImage = !!tweetPhoto && !hasVideo;
 
     // Language detection
     const zhChars = text.match(/[\u4e00-\u9fff]/g) || [];
@@ -340,10 +268,6 @@ function extractTweetData(tweet) {
     const metrics = extractEngagement(tweet);
 
     return {
-        username,
-        isWhitelisted,
-        isVerified: verificationInfo.isVerified,
-        verificationType: verificationInfo.verificationType,
         text,
         hasImage,
         hasVideo,
@@ -400,19 +324,8 @@ function parseNumber(str) {
     return Math.floor(num);
 }
 
-// Apply all filters (with layered priority)
+// Apply all filters
 function applyFilters(data) {
-    // Layer 1: Whitelist (highest priority)
-    if (data.isWhitelisted) {
-        return false; // Always show, skip all other filters
-    }
-
-    // Layer 2: Verification filter
-    if (settings.showOnlyVerified && !data.isVerified) {
-        return true; // Hide non-verified accounts
-    }
-
-    // Layer 3: Content filters (existing logic)
     // Short text filter
     if (settings.hideShortText) {
         if (data.isChinese && data.zhCount < 45) return true;
@@ -434,16 +347,15 @@ function applyFilters(data) {
         if (!match) return true;
     }
 
-    // Engagement filters - hide tweets that don't meet minimum thresholds
-    // Removed data.likes > 0 check so tweets with 0 likes are properly filtered
-    if (settings.minViews > 0 && data.views < settings.minViews) return true;
-    if (settings.maxViews > 0 && data.views > settings.maxViews) return true;
+    // Engagement filters (only if data exists)
+    if (settings.minViews > 0 && data.views > 0 && data.views < settings.minViews) return true;
+    if (settings.maxViews > 0 && data.views > 0 && data.views > settings.maxViews) return true;
 
-    if (settings.minLikes > 0 && data.likes < settings.minLikes) return true;
-    if (settings.maxLikes > 0 && data.likes > settings.maxLikes) return true;
+    if (settings.minLikes > 0 && data.likes > 0 && data.likes < settings.minLikes) return true;
+    if (settings.maxLikes > 0 && data.likes > 0 && data.likes > settings.maxLikes) return true;
 
-    if (settings.minRetweets > 0 && data.retweets < settings.minRetweets) return true;
-    if (settings.maxRetweets > 0 && data.retweets > settings.maxRetweets) return true;
+    if (settings.minRetweets > 0 && data.retweets > 0 && data.retweets < settings.minRetweets) return true;
+    if (settings.maxRetweets > 0 && data.retweets > 0 && data.retweets > settings.maxRetweets) return true;
 
     return false;
 }
@@ -455,7 +367,7 @@ function scheduleNotificationUpdate() {
     }
     notificationDebounce = setTimeout(() => {
         updateNotification();
-    }, 2000); // Increased to 2 seconds for more stability
+    }, 1000);
 }
 
 // Update notification
@@ -465,15 +377,15 @@ function updateNotification() {
     let filtered = 0;
 
     allTweets.forEach(tweet => {
-        if (tweet.style.display === 'none') {
+        if (tweet.style.visibility === 'hidden') {
             filtered++;
         } else {
             shown++;
         }
     });
 
-    // Only show if many filtered and very few shown
-    if (allTweets.length > 20 && shown < 3) {
+    // Only show if many filtered and none shown
+    if (allTweets.length > 20 && shown === 0) {
         showNotification();
     } else {
         hideNotification();

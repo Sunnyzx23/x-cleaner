@@ -2,8 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Elements
   const modeToggle = document.getElementById('modeToggle');
   const modeText = document.getElementById('modeText');
-  const filterSection = document.getElementById('filterSection');
 
+  // New elements
+  const whitelistInput = document.getElementById('whitelist');
+  const whitelistCount = document.getElementById('whitelistCount');
+  const showOnlyVerified = document.getElementById('showOnlyVerified');
+
+  // Existing elements
   const hideShortText = document.getElementById('hideShortText');
   const showOnlyImage = document.getElementById('showOnlyImage');
   const showOnlyVideo = document.getElementById('showOnlyVideo');
@@ -21,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Default Settings
   const defaultSettings = {
-    mode: 'clean',
+    mode: 'refined',
     hideShortText: true,
     showOnlyImage: false,
     showOnlyVideo: false,
@@ -32,14 +37,25 @@ document.addEventListener('DOMContentLoaded', () => {
     minLikes: 0,
     maxLikes: 0,
     minRetweets: 0,
-    maxRetweets: 0
+    maxRetweets: 0,
+    whitelist: [],
+    showOnlyVerified: false
   };
 
   // Load Settings
   chrome.storage.sync.get(defaultSettings, (items) => {
     // Set Mode Toggle
-    modeToggle.checked = items.mode === 'clean';
+    modeToggle.checked = items.mode === 'refined';
     updateUIState(items.mode);
+
+    // Set whitelist
+    if (items.whitelist && items.whitelist.length > 0) {
+      whitelistInput.value = items.whitelist.join(', ');
+      updateWhitelistCount(items.whitelist.length);
+    }
+
+    // Set verification filter
+    showOnlyVerified.checked = items.showOnlyVerified || false;
 
     // Set Filters
     hideShortText.checked = items.hideShortText;
@@ -48,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showImageVideo.checked = items.showImageVideo;
     languageFilter.value = items.languageFilter;
 
-    // Set engagement filters (both min and max)
+    // Set engagement filters
     minViews.value = items.minViews || '';
     maxViews.value = items.maxViews || '';
     minLikes.value = items.minLikes || '';
@@ -57,9 +73,37 @@ document.addEventListener('DOMContentLoaded', () => {
     maxRetweets.value = items.maxRetweets || '';
   });
 
+  // Parse whitelist input
+  function parseWhitelist(input) {
+    if (!input || input.trim() === '') return [];
+
+    // Split by comma, remove @ symbols, trim spaces, convert to lowercase, remove empty strings
+    const accounts = input
+      .split(',')
+      .map(acc => acc.trim().replace(/^@/, '').toLowerCase())
+      .filter(acc => acc.length > 0);
+
+    // Remove duplicates using Set
+    return [...new Set(accounts)];
+  }
+
+  // Update whitelist count display
+  function updateWhitelistCount(count) {
+    whitelistCount.textContent = count > 0 ? `当前 ${count} 个账号` : '';
+  }
+
+  // Update count when whitelist input changes
+  whitelistInput.addEventListener('blur', () => {
+    const accounts = parseWhitelist(whitelistInput.value);
+    updateWhitelistCount(accounts.length);
+    if (accounts.length > 0) {
+      whitelistInput.value = accounts.join(', ');
+    }
+  });
+
   // Event Listener for Mode Toggle
   modeToggle.addEventListener('change', (e) => {
-    const newMode = e.target.checked ? 'clean' : 'original';
+    const newMode = e.target.checked ? 'refined' : 'original';
     updateUIState(newMode);
 
     // Auto-save mode change immediately
@@ -71,32 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       chrome.storage.sync.set(updatedSettings, () => {
         showStatus('模式已切换');
-        // Reload the page to apply mode change
-        try {
-          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (chrome.runtime.lastError) {
-              console.log('PureFeed: Tab query error:', chrome.runtime.lastError);
-              return;
-            }
-            if (tabs && tabs[0] && tabs[0].url && tabs[0].url.includes('x.com')) {
-              chrome.tabs.reload(tabs[0].id, () => {
-                if (chrome.runtime.lastError) {
-                  console.log('PureFeed: Reload error:', chrome.runtime.lastError);
-                }
-              });
-            }
-          });
-        } catch (err) {
-          console.log('PureFeed: Error in mode toggle:', err);
-        }
       });
     });
   });
 
   // Save Button
   saveBtn.addEventListener('click', () => {
+    const whitelistAccounts = parseWhitelist(whitelistInput.value);
+
     const settings = {
-      mode: modeToggle.checked ? 'clean' : 'original',
+      mode: modeToggle.checked ? 'refined' : 'original',
+      whitelist: whitelistAccounts,
+      showOnlyVerified: showOnlyVerified.checked,
       hideShortText: hideShortText.checked,
       showOnlyImage: showOnlyImage.checked,
       showOnlyVideo: showOnlyVideo.checked,
@@ -111,8 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     chrome.storage.sync.set(settings, () => {
-      showStatus('设置已保存');
-      // Notify content script and reload the page to apply new filters
+      showStatus('✅ 设置已保存');
+      updateWhitelistCount(whitelistAccounts.length);
+
+      // **FIX #1: Reload X/Twitter tab to apply filters**
       try {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           if (chrome.runtime.lastError) {
@@ -128,46 +160,31 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       } catch (err) {
-        console.log('PureFeed: Error in save:', err);
+        console.log('PureFeed: Error reloading tab:', err);
       }
-      // Badge will be updated automatically via storage.onChanged in background.js
     });
   });
 
   function updateUIState(mode) {
-    const filterSection = document.getElementById('filterSection');
-    const languageSection = document.querySelector('.language-section');
-    const engagementSection = document.querySelector('.engagement-section');
+    const whitelistSection = document.querySelector('.whitelist-section');
+    const accountSection = document.querySelector('.account-section');
+    const contentSection = document.querySelector('.content-section');
 
     if (mode === 'original') {
-      filterSection.classList.add('disabled');
-      languageSection?.classList.add('disabled');
-      engagementSection?.classList.add('disabled');
+      whitelistSection?.classList.add('disabled');
+      accountSection?.classList.add('disabled');
+      contentSection?.classList.add('disabled');
       modeText.textContent = '原始模式';
       modeText.style.color = '#536471';
-      // Disable save button in original mode
       saveBtn.disabled = true;
-
-      // Add click handler to switch mode
-      filterSection.onclick = handleOverlayClick;
     } else {
-      filterSection.classList.remove('disabled');
-      languageSection?.classList.remove('disabled');
-      engagementSection?.classList.remove('disabled');
+      whitelistSection?.classList.remove('disabled');
+      accountSection?.classList.remove('disabled');
+      contentSection?.classList.remove('disabled');
       modeText.textContent = '精简模式';
       modeText.style.color = 'var(--primary-color)';
-      // Enable save button in clean mode
       saveBtn.disabled = false;
-
-      // Remove click handler
-      filterSection.onclick = null;
     }
-  }
-
-  function handleOverlayClick() {
-    // Switch to clean mode
-    modeToggle.checked = true;
-    modeToggle.dispatchEvent(new Event('change'));
   }
 
   function showStatus(msg) {

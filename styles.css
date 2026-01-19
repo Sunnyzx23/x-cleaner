@@ -406,7 +406,79 @@ textarea {
 .language-section.disabled,
 .keyword-section.disabled,
 .engagement-section.disabled,
-.whitelist-section.disabled {
+.whitelist-section.disabled,
+.account-section.disabled,
+.content-section.disabled {
   opacity: 0.4;
   pointer-events: none;
+}
+
+/* Three-layer structure styles */
+.whitelist-section {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.account-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.content-section {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+/* Form group for whitelist input */
+.form-group {
+  margin-top: 8px;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+
+.form-group input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+/* Account count display */
+.account-count {
+  font-size: 12px;
+  color: var(--primary-color);
+  font-weight: 600;
+  margin: 4px 0 0 0;
+}
+
+/* Filter subsections within content section */
+.filter-subsection {
+  margin-bottom: 16px;
+}
+
+.filter-subsection:last-child {
+  margin-bottom: 0;
+}
+
+.filter-subsection h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-color);
 }

@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PureFeed</title>
-    <title>PureFeed</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -22,64 +21,91 @@
             </div>
         </header>
 
-        <div class="section filter-section" id="filterSection">
-            <h2>过滤规则 <span class="hint-inline">(满足任一条件即显示)</span></h2>
-
-            <div class="checkbox-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="hideShortText" checked>
-                    <span>隐藏短文本推文 <span class="sub-text">(中 < 45 / 英 < 30)</span></span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showOnlyImage">
-                    <span>只显示带图推文</span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showOnlyVideo">
-                    <span>只显示带视频推文</span>
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="showImageVideo">
-                    <span>只显示图+视频推文</span>
-                </label>
+        <!-- Layer 1: Whitelist -->
+        <div class="section whitelist-section">
+            <h2>⭐ 白名单 <span class="sub-text">(始终显示)</span></h2>
+            <div class="form-group">
+                <input type="text" id="whitelist" placeholder="账号用户名，用逗号分隔 (例如: elonmusk, sama)">
+                <p class="hint">💡 白名单账号的推文将始终显示，不受其他任何过滤条件影响</p>
+                <p id="whitelistCount" class="account-count"></p>
             </div>
         </div>
 
-        <div class="section language-section">
-            <h2>语言过滤</h2>
-            <select id="languageFilter">
-                <option value="all">全部</option>
-                <option value="zh">仅中文</option>
-                <option value="non-zh">仅英文</option>
-            </select>
+        <!-- Layer 2: Account Filter -->
+        <div class="section account-section">
+            <h2>👤 账号过滤</h2>
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="showOnlyVerified">
+                    <span>只显示认证账号</span>
+                </label>
+            </div>
+            <p class="hint">💡 先筛选账号类型，再应用下方的内容过滤</p>
         </div>
 
-        <div class="section engagement-section">
-            <h2>互动量过滤</h2>
-            <p class="hint">设置互动量区间 (0表示不限制)</p>
-            <div class="engagement-inputs">
-                <div class="input-row">
-                    <label>浏览量</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minViews" placeholder="最低" min="0">
-                        <span>-</span>
-                        <input type="number" id="maxViews" placeholder="最高" min="0">
-                    </div>
+        <!-- Layer 3: Content Filter -->
+        <div class="section content-section">
+            <h2>📝 内容过滤</h2>
+            <p class="hint">💡 这些条件将应用于所有非白名单账号的推文</p>
+
+            <div class="filter-subsection">
+                <h3>过滤规则 <span class="hint-inline">(满足任一条件即显示)</span></h3>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="hideShortText" checked>
+                        <span>隐藏短文本推文 <span class="sub-text">(中 < 45 / 英 < 30)</span></span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showOnlyImage">
+                        <span>只显示带图推文</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showOnlyVideo">
+                        <span>只显示带视频推文</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showImageVideo">
+                        <span>只显示图+视频推文</span>
+                    </label>
                 </div>
-                <div class="input-row">
-                    <label>点赞数</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minLikes" placeholder="最低" min="0">
-                        <span>-</span>
-                        <input type="number" id="maxLikes" placeholder="最高" min="0">
+            </div>
+
+            <div class="filter-subsection">
+                <h3>语言过滤</h3>
+                <select id="languageFilter">
+                    <option value="all">全部</option>
+                    <option value="zh">仅中文</option>
+                    <option value="non-zh">仅英文</option>
+                </select>
+            </div>
+
+            <div class="filter-subsection">
+                <h3>互动量过滤</h3>
+                <p class="hint">设置互动量区间 (0表示不限制)</p>
+                <div class="engagement-inputs">
+                    <div class="input-row">
+                        <label>浏览量</label>
+                        <div class="range-inputs">
+                            <input type="number" id="minViews" placeholder="最低" min="0">
+                            <span>-</span>
+                            <input type="number" id="maxViews" placeholder="最高" min="0">
+                        </div>
                     </div>
-                </div>
-                <div class="input-row">
-                    <label>转发数</label>
-                    <div class="range-inputs">
-                        <input type="number" id="minRetweets" placeholder="最低" min="0">
-                        <span>-</span>
-                        <input type="number" id="maxRetweets" placeholder="最高" min="0">
+                    <div class="input-row">
+                        <label>点赞数</label>
+                        <div class="range-inputs">
+                            <input type="number" id="minLikes" placeholder="最低" min="0">
+                            <span>-</span>
+                            <input type="number" id="maxLikes" placeholder="最高" min="0">
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <label>转发数</label>
+                        <div class="range-inputs">
+                            <input type="number" id="minRetweets" placeholder="最低" min="0">
+                            <span>-</span>
+                            <input type="number" id="maxRetweets" placeholder="最高" min="0">
+                        </div>
                     </div>
                 </div>
             </div>
